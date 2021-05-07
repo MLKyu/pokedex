@@ -22,6 +22,7 @@ d. 알려진 서식지 여부는 pokemon_locations API 에 선택된 포켓몬�
 3. 서식지가 알려진 포켓몬이라면, 상세정보 화면의 [지도] 버튼을 눌러 지도상에서
 포켓몬의 서식지를 확인할 수 있다. 서식지는 지도 상에 마커 형태로 표시한다.
 * API
+
 다음 API만을 사용해서 구현한다.
 ● 포켓몬 이름 - id 매핑 API: https://demo0928971.mockable.io/pokemon_name
 ● 포켓몬 별 서식지 정보 API: https://demo0928971.mockable.io/pokemon_locations
