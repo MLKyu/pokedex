@@ -9,10 +9,23 @@
         android:id="@+id/searchFragment"
         android:name="com.alansoft.pokedex.ui.search.SearchFragment"
         android:label="Search"
-        tools:layout="@layout/fragment_search"></fragment>
+        tools:layout="@layout/fragment_search">
+
+        <action
+            android:id="@+id/search_to_dialog"
+            app:destination="@id/detail_dialog"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <dialog
-        android:id="@+id/my_dialog"
+        android:id="@+id/detail_dialog"
         android:name="com.alansoft.pokedex.ui.dialog.DetailDialog"
-        tools:layout="@layout/fragment_detail" />
+        tools:layout="@layout/fragment_detail">
+        <argument
+            android:name="bundle"
+            app:argType="android.os.Bundle" />
+    </dialog>
 </navigation>

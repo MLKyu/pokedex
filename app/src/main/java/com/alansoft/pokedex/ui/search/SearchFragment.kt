@@ -5,10 +5,12 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.response.Pokemons
+import com.alansoft.pokedex.data.model.Name
 import com.alansoft.pokedex.databinding.FragmentSearchBinding
 import com.alansoft.pokedex.ui.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -84,7 +86,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         }
     }
 
-    private fun onItemClicked(item: Pokemons) {
-
+    private fun onItemClicked(item: Name) {
+        if (findNavController().currentDestination?.id == R.id.searchFragment) {
+            val bundle = bundleOf("name" to item.getName(), "id" to item.id)
+            val direction = SearchFragmentDirections.searchToDialog(bundle)
+            findNavController().navigate(direction)
+        }
     }
 }

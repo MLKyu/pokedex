@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.response.PokemonNameResponse
+import com.alansoft.pokedex.data.model.PokemonNameResponse
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,21 +21,17 @@ import javax.inject.Inject
 class SearchViewModel @Inject constructor(
     private val repository: SearchRepository
 ) : ViewModel() {
-
     private val query = MutableStateFlow("")
     val results: LiveData<Resource<PokemonNameResponse>> = query
         .filter {
             it.isNotEmpty()
         }.flatMapLatest {
-            repository.getPokemonName()
+            repository.getPokemonName(it)
         }.asLiveData()
 
     fun setQuery(originalInput: String) {
         val input = originalInput.toLowerCase(Locale.getDefault()).trim()
-        if (input == query.value) {
-            return
-        }
-        if (input.isNotBlank()) {
+        if (query.value != input) {
             query.value = input
         }
     }

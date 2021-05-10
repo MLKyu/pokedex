@@ -7,7 +7,7 @@
 
         <variable
             name="item"
-            type="com.alansoft.pokedex.data.response.Name" />
+            type="com.alansoft.pokedex.data.model.Name" />
     </data>
 
     <androidx.cardview.widget.CardView

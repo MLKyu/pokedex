@@ -1,4 +1,4 @@
-package com.alansoft.pokedex.data.response
+package com.alansoft.pokedex.data.model
 
 /**
  * Created by LEE MIN KYU on 2021/05/09

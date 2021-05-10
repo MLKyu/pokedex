@@ -60,6 +60,29 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun `providePokeApi`(retrofit: Retrofit): DemoApi =
+    fun provideDemoApi(retrofit: Retrofit): DemoApi =
         retrofit.create(DemoApi::class.java)
 }
+//
+//@Module
+//@InstallIn(SingletonComponent::class)
+//object NetworkModule2 {
+//    @Singleton
+//    @Provides
+//    fun provideRetrofit(client: OkHttpClient): Retrofit =
+//        Retrofit.Builder()
+//            .baseUrl("https://pokeapi.co/")
+//            .addConverterFactory(
+//                GsonConverterFactory.create(
+//                    GsonBuilder()
+//                        .create()
+//                )
+//            )
+//            .client(client)
+//            .build()
+//
+//    @Singleton
+//    @Provides
+//    fun providePokeApi(retrofit: Retrofit): PokeApi =
+//        retrofit.create(PokeApi::class.java)
+//}

@@ -1,7 +1,7 @@
 package com.alansoft.pokedex.data.api
 
-import com.alansoft.pokedex.data.response.PokemonLocationResponse
-import com.alansoft.pokedex.data.response.PokemonNameResponse
+import com.alansoft.pokedex.data.model.PokemonLocationResponse
+import com.alansoft.pokedex.data.model.PokemonNameResponse
 import retrofit2.http.GET
 
 /**
