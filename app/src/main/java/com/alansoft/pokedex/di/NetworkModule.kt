@@ -1,5 +1,6 @@
 package com.alansoft.pokedex.di
 
+import android.util.Log
 import com.alansoft.pokedex.data.api.DemoApi
 import com.google.gson.GsonBuilder
 import dagger.Module
@@ -20,19 +21,24 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-object DataModule {
+object NetworkModule {
     @Singleton
     @Provides
-    fun providesOkHttpClient(): OkHttpClient {
-        val chainInterceptor = { chain: Interceptor.Chain ->
-            chain.proceed(
-                chain.request().newBuilder()
-                    .build()
-            )
-        }
+    fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(chainInterceptor)
+            .addInterceptor { chain: Interceptor.Chain ->
+                chain.proceed(
+                    chain.request().newBuilder()
+                        .build()
+                )
+            }
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .addInterceptor(Interceptor {
+                val originalRequest = it.request()
+                val request = originalRequest.newBuilder().url(originalRequest.url).build()
+                Log.d("OkHttp", request.toString())
+                it.proceed(request)
+            })
             .readTimeout(120, TimeUnit.SECONDS)
             .connectTimeout(120, TimeUnit.SECONDS)
             .build()
@@ -40,7 +46,7 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun providesRetrofitBuilder(client: OkHttpClient): Retrofit =
+    fun provideRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
             .baseUrl("https://demo0928971.mockable.io/")
             .addConverterFactory(
@@ -54,6 +60,6 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun providesPokeApi(retrofit: Retrofit): DemoApi =
+    fun `providePokeApi`(retrofit: Retrofit): DemoApi =
         retrofit.create(DemoApi::class.java)
 }
