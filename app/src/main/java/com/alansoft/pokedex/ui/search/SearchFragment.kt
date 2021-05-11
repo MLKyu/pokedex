@@ -5,7 +5,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import androidx.appcompat.widget.SearchView
-import androidx.core.os.bundleOf
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.alansoft.pokedex.R
@@ -62,25 +61,25 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                 }
             })
 
-//            detailResult.observe(viewLifecycleOwner, {
-//                when (it) {
-//                    is Resource.Success -> {
-// showDetail()
-//                    }
-//                    is Resource.Empty -> {
-//                    }
-//                    is Resource.Error -> {
-//                        val message = if (it.isNetworkError) {
-//                            "네트워크 연결을 확인 하세요."
-//                        } else {
-//                            it.exception.message
-//                        }
-//                    }
-//                    else -> {
-//                        // nothing
-//                    }
-//                }
-//            })
+            detailResult.observe(viewLifecycleOwner, {
+                when (it) {
+                    is Resource.Success -> {
+                        showDetail(it.data)
+                    }
+                    is Resource.Empty -> {
+                    }
+                    is Resource.Error -> {
+                        val message = if (it.isNetworkError) {
+                            "네트워크 연결을 확인 하세요."
+                        } else {
+                            it.exception.message
+                        }
+                    }
+                    else -> {
+                        // nothing
+                    }
+                }
+            })
         }
     }
 
@@ -111,17 +110,14 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     private fun onItemClicked(item: Name) {
         if (findNavController().currentDestination?.id == R.id.searchFragment) {
-            val bundle = bundleOf("data" to item)
-            val direction = SearchFragmentDirections.searchToDialog(bundle)
-            findNavController().navigate(direction)
+            viewModel.requestDetail(item.id)
         }
     }
 
     private fun showDetail(item: PokemonDetailResponse) {
-//        if (findNavController().currentDestination?.id == R.id.searchFragment) {
-//            val bundle = bundleOf("data" to PokemonDetailResponse)
-//            val direction = SearchFragmentDirections.searchToDialog(bundle)
-//            findNavController().navigate(direction)
-//        }
+        if (findNavController().currentDestination?.id == R.id.searchFragment) {
+            val direction = SearchFragmentDirections.searchToDialog(item)
+            findNavController().navigate(direction)
+        }
     }
 }

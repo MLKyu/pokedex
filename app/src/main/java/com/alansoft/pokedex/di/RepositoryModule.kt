@@ -1,7 +1,7 @@
 package com.alansoft.pokedex.di
 
-import com.alansoft.pokedex.data.SearchDataSource
-import com.alansoft.pokedex.data.api.DemoApi
+import com.alansoft.pokedex.data.RemoteDataSource
+import com.alansoft.pokedex.data.api.PokeApi
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.Module
 import dagger.Provides
@@ -18,13 +18,9 @@ import dagger.hilt.android.scopes.ViewModelScoped
 object RepositoryModule {
     @ViewModelScoped
     @Provides
-    fun provideSearchDataSource(demoApi: DemoApi) =
-        SearchDataSource(demoApi)
+    fun provideSearchDataSource(demoApi: PokeApi) = RemoteDataSource(demoApi)
 
     @ViewModelScoped
     @Provides
-    fun provideSearchRepository(
-        remote: SearchDataSource
-    ) =
-        SearchRepository(remote)
+    fun provideSearchRepository(remote: RemoteDataSource) = SearchRepository(remote)
 }

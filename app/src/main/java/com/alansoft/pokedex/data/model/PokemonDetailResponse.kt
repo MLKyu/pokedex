@@ -17,6 +17,18 @@ data class PokemonDetailResponse(
 ) : Pokemons(), Parcelable {
     fun getWeightString(): String = String.format("%.1f KG", weight.toFloat() / 10)
     fun getHeightString(): String = String.format("%.1f M", height.toFloat() / 10)
+    fun getRepresentativeUri(): String? {
+        if (sprites == null) {
+            return ""
+        }
+        return sprites.run {
+            if (frontDefault != null) {
+                frontDefault
+            } else {
+                null
+            }
+        }
+    }
 }
 
 @Parcelize
@@ -38,15 +50,7 @@ data class Sprites(
     @SerializedName("front_shiny_female")
     val frontShinyFemale: String?,
     val other: Other?,
-) : Parcelable {
-    fun getRepresentativeUri(): String? {
-        return if (frontDefault != null) {
-            frontDefault
-        } else {
-            null
-        }
-    }
-}
+) : Parcelable
 
 @Parcelize
 data class Other(

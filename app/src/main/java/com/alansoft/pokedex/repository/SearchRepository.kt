@@ -1,8 +1,9 @@
 package com.alansoft.pokedex.repository
 
 import androidx.annotation.WorkerThread
+import com.alansoft.pokedex.data.RemoteDataSource
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.SearchDataSource
+import com.alansoft.pokedex.data.model.PokemonDetailResponse
 import com.alansoft.pokedex.data.model.PokemonLocationResponse
 import com.alansoft.pokedex.data.model.PokemonNameResponse
 import kotlinx.coroutines.Dispatchers
@@ -14,13 +15,11 @@ import javax.inject.Inject
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
-class SearchRepository @Inject constructor(
-    private val searchRemote: SearchDataSource
-) {
+class SearchRepository @Inject constructor(private val remote: RemoteDataSource) {
     @WorkerThread
     fun getPokemonName(query: String): Flow<Resource<PokemonNameResponse>> = flow {
         emit(Resource.loading())
-        val response: PokemonNameResponse = searchRemote.getPokemonName()
+        val response: PokemonNameResponse = remote.getPokemonName()
         emit(
             if (response.pokemons.isNullOrEmpty()) {
                 Resource.empty()
@@ -43,7 +42,7 @@ class SearchRepository @Inject constructor(
     @WorkerThread
     fun getPokemonLocation(id: Long): Flow<Resource<PokemonLocationResponse>> = flow {
         emit(Resource.loading())
-        val response: PokemonLocationResponse = searchRemote.getPokemonLocations()
+        val response: PokemonLocationResponse = remote.getPokemonLocations()
         emit(
             if (response.pokemons.isNullOrEmpty()) {
                 Resource.empty()
@@ -52,6 +51,17 @@ class SearchRepository @Inject constructor(
                 Resource.success(response)
             }
         )
+    }.retry(2) { cause ->
+        cause is IOException
+    }.catch { e ->
+        emit(Resource.error(e))
+    }.flowOn(Dispatchers.IO)
+
+    @WorkerThread
+    fun getPokemonInfo(id: Long): Flow<Resource<PokemonDetailResponse>> = flow {
+        emit(Resource.loading())
+        val response: PokemonDetailResponse = remote.getPokemonInfo(id)
+        emit(Resource.success(response))
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->

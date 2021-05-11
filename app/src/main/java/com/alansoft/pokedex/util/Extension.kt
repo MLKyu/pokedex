@@ -21,10 +21,10 @@ fun <T> Fragment.setNavigationResult(result: T, key: String = "result") {
     findNavController().previousBackStackEntry?.savedStateHandle?.set(key, result)
 }
 
-fun ImageView.loadWithThumbnail(uri: String?, sizeMultiplier: Float = 0.25f) {
+fun ImageView.loadWithThumbnail(uri: String?) {
     Glide.with(context)
         .load(uri)
-        .thumbnail(sizeMultiplier)
+        .thumbnail(0.1f)
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(this)
 }

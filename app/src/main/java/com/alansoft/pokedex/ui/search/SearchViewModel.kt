@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.alansoft.pokedex.data.Resource
+import com.alansoft.pokedex.data.model.PokemonDetailResponse
 import com.alansoft.pokedex.data.model.PokemonNameResponse
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -38,10 +39,17 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-//    val detailResult: LiveData<Resource<PokemonDetailResponse>> = id
-//        .filter {
-//            it >= 0
-//        }.flatMapLatest {
-//        }.asLiveData()
+    fun requestDetail(id: Long) {
+        if (this.id.value != id) {
+            this.id.value = id
+        }
+    }
+
+    val detailResult: LiveData<Resource<PokemonDetailResponse>> = id
+        .filter {
+            it >= 0
+        }.flatMapLatest {
+            repository.getPokemonInfo(it)
+        }.asLiveData()
 
 }

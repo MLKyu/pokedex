@@ -1,7 +1,8 @@
 package com.alansoft.pokedex.di
 
 import android.util.Log
-import com.alansoft.pokedex.data.api.DemoApi
+import com.alansoft.pokedex.data.ChangeHostInterceptor
+import com.alansoft.pokedex.data.api.PokeApi
 import com.google.gson.GsonBuilder
 import dagger.Module
 import dagger.Provides
@@ -22,10 +23,14 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
+    const val POKE_HOST = "https://pokeapi.co/"
+    const val MOCK_HOST = "https://demo0928971.mockable.io/"
+
     @Singleton
     @Provides
     fun provideOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
+            .addInterceptor(ChangeHostInterceptor)
             .addInterceptor { chain: Interceptor.Chain ->
                 chain.proceed(
                     chain.request().newBuilder()
@@ -48,7 +53,7 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit =
         Retrofit.Builder()
-            .baseUrl("https://demo0928971.mockable.io/")
+            .baseUrl(MOCK_HOST)
             .addConverterFactory(
                 GsonConverterFactory.create(
                     GsonBuilder()
@@ -60,29 +65,6 @@ object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideDemoApi(retrofit: Retrofit): DemoApi =
-        retrofit.create(DemoApi::class.java)
+    fun providePokeApi(retrofit: Retrofit): PokeApi = retrofit.create(PokeApi::class.java)
+
 }
-//
-//@Module
-//@InstallIn(SingletonComponent::class)
-//object NetworkModule2 {
-//    @Singleton
-//    @Provides
-//    fun provideRetrofit(client: OkHttpClient): Retrofit =
-//        Retrofit.Builder()
-//            .baseUrl("https://pokeapi.co/")
-//            .addConverterFactory(
-//                GsonConverterFactory.create(
-//                    GsonBuilder()
-//                        .create()
-//                )
-//            )
-//            .client(client)
-//            .build()
-//
-//    @Singleton
-//    @Provides
-//    fun providePokeApi(retrofit: Retrofit): PokeApi =
-//        retrofit.create(PokeApi::class.java)
-//}

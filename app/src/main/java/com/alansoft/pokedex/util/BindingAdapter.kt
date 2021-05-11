@@ -7,8 +7,10 @@ import androidx.databinding.BindingAdapter
  * Created by LEE MIN KYU on 2021/05/10
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
-
-@BindingAdapter("loadImg")
-fun laodImg(view: ImageView, url: String) {
-    view.loadWithThumbnail(url)
+object BindingAdapter {
+    @JvmStatic
+    @BindingAdapter("laodImg")
+    fun laodImg(view: ImageView, url: String) {
+        view.loadWithThumbnail(url)
+    }
 }

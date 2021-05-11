@@ -9,7 +9,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.navArgs
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.databinding.FragmentDetailBinding
-import com.alansoft.pokedex.util.toast
 
 /**
  * Created by LEE MIN KYU on 2021/05/09
@@ -30,9 +29,8 @@ class DetailDialog : DialogFragment() {
     }
 
     private fun bindView() {
-        toast(args.bundle.getLong("id").toString())
         with(binding) {
-            name.text = args.bundle.getString("name")
+            data = args.item
             dialogBtn.setOnClickListener {
                 dismiss()
             }

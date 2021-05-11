@@ -25,7 +25,7 @@
         android:name="com.alansoft.pokedex.ui.dialog.DetailDialog"
         tools:layout="@layout/fragment_detail">
         <argument
-            android:name="bundle"
-            app:argType="android.os.Bundle" />
+            android:name="item"
+            app:argType="com.alansoft.pokedex.data.model.PokemonDetailResponse" />
     </dialog>
 </navigation>
