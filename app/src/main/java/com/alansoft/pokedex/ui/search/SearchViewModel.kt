@@ -23,7 +23,7 @@ class SearchViewModel @Inject constructor(
     private val repository: SearchRepository
 ) : ViewModel() {
     private val query = MutableStateFlow("")
-    private val id = MutableStateFlow(-1L)
+    private val id = MutableStateFlow(Pair<Long, String>(-1L, ""))
 
     val results: LiveData<Resource<PokemonNameResponse>> = query
         .filter {
@@ -39,15 +39,15 @@ class SearchViewModel @Inject constructor(
         }
     }
 
-    fun requestDetail(id: Long) {
-        if (this.id.value != id) {
-            this.id.value = id
+    fun requestDetail(id: Long, name: String) {
+        if (this.id.value.first != id) {
+            this.id.value = id to name
         }
     }
 
     val detailResult: LiveData<Resource<PokemonDetailResponse>> = id
         .filter {
-            it >= 0
+            it.first >= 0
         }.flatMapLatest {
             repository.getPokemonInfo(it)
         }.asLiveData()

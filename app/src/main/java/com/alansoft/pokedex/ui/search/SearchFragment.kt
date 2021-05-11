@@ -43,17 +43,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         viewModel.run {
             results.observe(viewLifecycleOwner, {
                 when (it) {
+                    is Resource.Loading -> {
+
+                    }
                     is Resource.Success -> {
                         adapter.submitList(it.data.pokemons)
-                    }
-                    is Resource.Empty -> {
-                    }
-                    is Resource.Error -> {
-                        val message = if (it.isNetworkError) {
-                            "네트워크 연결을 확인 하세요."
-                        } else {
-                            it.exception.message
-                        }
                     }
                     else -> {
                         // nothing
@@ -63,17 +57,11 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
             detailResult.observe(viewLifecycleOwner, {
                 when (it) {
+                    is Resource.Loading -> {
+
+                    }
                     is Resource.Success -> {
                         showDetail(it.data)
-                    }
-                    is Resource.Empty -> {
-                    }
-                    is Resource.Error -> {
-                        val message = if (it.isNetworkError) {
-                            "네트워크 연결을 확인 하세요."
-                        } else {
-                            it.exception.message
-                        }
                     }
                     else -> {
                         // nothing
@@ -110,7 +98,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     private fun onItemClicked(item: Name) {
         if (findNavController().currentDestination?.id == R.id.searchFragment) {
-            viewModel.requestDetail(item.id)
+            viewModel.requestDetail(item.id, item.getName())
         }
     }
 

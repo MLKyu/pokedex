@@ -5,8 +5,8 @@ package com.alansoft.pokedex.data.model
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
 data class PokemonNameResponse(
-    val pokemons: List<Name?>?
-)
+    var pokemons: List<Name?>?
+) : PokemonResponse()
 
 data class Name(
     val names: List<String?>?
@@ -29,6 +29,8 @@ data class Name(
 }
 
 open class Pokemons {
-    val id: Long = -1
+    var id: Long = -1
     fun getIdString(): String = String.format("#%03d", id)
 }
+
+open class PokemonResponse
