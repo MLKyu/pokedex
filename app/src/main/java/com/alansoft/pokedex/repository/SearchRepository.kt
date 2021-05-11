@@ -25,9 +25,11 @@ class SearchRepository @Inject constructor(private val remote: RemoteDataSource)
             if (response.pokemons.isNullOrEmpty()) {
                 Resource.empty()
             } else {
+                val lowerQuery = query.toLowerCase()
+
                 val list = response.pokemons?.filter { filter ->
                     !filter?.names.isNullOrEmpty() && filter?.names?.find {
-                        it?.contains(query) ?: false
+                        it?.contains(lowerQuery) ?: false
                     } != null
                 }
 
