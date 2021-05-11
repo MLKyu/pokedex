@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.Resource
 import com.alansoft.pokedex.data.model.Name
+import com.alansoft.pokedex.data.model.PokemonDetailResponse
 import com.alansoft.pokedex.databinding.FragmentSearchBinding
 import com.alansoft.pokedex.ui.base.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,25 +41,47 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
     }
 
     private fun setSubscribe() {
-        viewModel.results.observe(viewLifecycleOwner, {
-            when (it) {
-                is Resource.Success -> {
-                    adapter.submitList(it.data.pokemons)
-                }
-                is Resource.Empty -> {
-                }
-                is Resource.Error -> {
-                    val message = if (it.isNetworkError) {
-                        "네트워크 연결을 확인 하세요."
-                    } else {
-                        it.exception.message
+        viewModel.run {
+            results.observe(viewLifecycleOwner, {
+                when (it) {
+                    is Resource.Success -> {
+                        adapter.submitList(it.data.pokemons)
+                    }
+                    is Resource.Empty -> {
+                    }
+                    is Resource.Error -> {
+                        val message = if (it.isNetworkError) {
+                            "네트워크 연결을 확인 하세요."
+                        } else {
+                            it.exception.message
+                        }
+                    }
+                    else -> {
+                        // nothing
                     }
                 }
-                else -> {
-                    // nothing
-                }
-            }
-        })
+            })
+
+//            detailResult.observe(viewLifecycleOwner, {
+//                when (it) {
+//                    is Resource.Success -> {
+// showDetail()
+//                    }
+//                    is Resource.Empty -> {
+//                    }
+//                    is Resource.Error -> {
+//                        val message = if (it.isNetworkError) {
+//                            "네트워크 연결을 확인 하세요."
+//                        } else {
+//                            it.exception.message
+//                        }
+//                    }
+//                    else -> {
+//                        // nothing
+//                    }
+//                }
+//            })
+        }
     }
 
 
@@ -88,9 +111,17 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     private fun onItemClicked(item: Name) {
         if (findNavController().currentDestination?.id == R.id.searchFragment) {
-            val bundle = bundleOf("name" to item.getName(), "id" to item.id)
+            val bundle = bundleOf("data" to item)
             val direction = SearchFragmentDirections.searchToDialog(bundle)
             findNavController().navigate(direction)
         }
+    }
+
+    private fun showDetail(item: PokemonDetailResponse) {
+//        if (findNavController().currentDestination?.id == R.id.searchFragment) {
+//            val bundle = bundleOf("data" to PokemonDetailResponse)
+//            val direction = SearchFragmentDirections.searchToDialog(bundle)
+//            findNavController().navigate(direction)
+//        }
     }
 }

@@ -1,11 +1,13 @@
 package com.alansoft.pokedex.data.model
 
 import com.google.gson.annotations.SerializedName
+import kotlinx.android.parcel.Parcelize
 
 /**
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
+@Parcelize
 data class PokemonDetailResponse(
     var name: String?,
     val weight: Int,
