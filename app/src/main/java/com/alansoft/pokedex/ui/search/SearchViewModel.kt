@@ -30,7 +30,10 @@ class SearchViewModel @Inject constructor(
         .filter {
             it.isNotEmpty()
         }.flatMapLatest {
-            repository.getPokemonName(it) { query, data -> search(query, data) }
+            repository.getPokemonName(
+                it,
+                { },
+                { query, data -> search(query, data) })
         }.asLiveData()
 
     fun setQuery(originalInput: String) {

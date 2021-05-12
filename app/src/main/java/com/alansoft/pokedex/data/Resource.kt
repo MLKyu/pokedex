@@ -13,12 +13,10 @@ sealed class Resource<out T> {
     }
 
     object Empty : Resource<Nothing>()
-    object Loading : Resource<Nothing>()
     companion object {
         fun <T> success(data: T) = Success(data)
         fun error(exception: Throwable) = Error(exception)
         fun empty() = Empty
-        fun loading() = Loading
         fun <T> pushAndSuccess(data: T, block: (data: T) -> Unit): Resource<T> {
             block(data)
             return Success(data)

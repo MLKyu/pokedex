@@ -26,6 +26,7 @@ class SearchRepository @Inject constructor(
     @WorkerThread
     fun getPokemonName(
         query: String,
+        onLoading: (Boolean) -> Unit,
         onSearch: (query: String, List<Name?>) -> List<Name?>
     ): Flow<Resource<PokemonNameResponse>> = flow {
         val response: PokemonNameResponse
@@ -53,11 +54,13 @@ class SearchRepository @Inject constructor(
             }
         )
     }.onStart {
-        emit(Resource.loading())
+        onLoading(true)
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->
         emit(Resource.error(e))
+    }.onCompletion {
+        onLoading(false)
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
@@ -87,7 +90,7 @@ class SearchRepository @Inject constructor(
             }
         )
     }.onStart {
-        emit(Resource.loading())
+    }.onCompletion {
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->
@@ -101,7 +104,7 @@ class SearchRepository @Inject constructor(
             response.name = id.second
             emit(Resource.success(response))
         }.onStart {
-            emit(Resource.loading())
+        }.onCompletion {
         }.retry(2) { cause ->
             cause is IOException
         }.catch { e ->

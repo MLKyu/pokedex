@@ -35,6 +35,7 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.viewModel = viewModel
         setHasOptionsMenu(true)
         setRecyclerAdapter()
         setSubscribe()
@@ -44,14 +45,18 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
         viewModel.run {
             results.observe(viewLifecycleOwner, {
                 when (it) {
-                    is Resource.Loading -> {
-
-                    }
                     is Resource.Success -> {
                         adapter.submitList(it.data.pokemons)
                     }
                     is Resource.Empty -> {
                         toast("검색 결과가 없습니다.")
+                    }
+                    is Resource.Error -> {
+                        if (it.isNetworkError) {
+                            toast("네트워크 연결을 해주세요")
+                        } else {
+                            toast("Error ${it.exception}")
+                        }
                     }
                     else -> {
                         // nothing
@@ -61,11 +66,18 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
 
             detailResult.observe(viewLifecycleOwner, {
                 when (it) {
-                    is Resource.Loading -> {
-
-                    }
                     is Resource.Success -> {
                         showDetail(it.data)
+                    }
+                    is Resource.Empty -> {
+                        toast("포켓몬 정보가 없습니다.")
+                    }
+                    is Resource.Error -> {
+                        if (it.isNetworkError) {
+                            toast("네트워크 연결을 해주세요")
+                        } else {
+                            toast("Error ${it.exception}")
+                        }
                     }
                     else -> {
                         // nothing

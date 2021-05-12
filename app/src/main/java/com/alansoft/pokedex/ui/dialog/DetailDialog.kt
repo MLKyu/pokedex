@@ -52,6 +52,13 @@ class DetailDialog : DialogFragment() {
                     is Resource.Empty -> {
                         toast("서식지 정보가 없습니다.")
                     }
+                    is Resource.Error -> {
+                        if (it.isNetworkError) {
+                            toast("네트워크 연결을 해주세요")
+                        } else {
+                            toast("Error ${it.exception}")
+                        }
+                    }
                     else -> {
                         // nothing
                     }
