@@ -1,7 +1,6 @@
 package com.alansoft.pokedex.map
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.model.Location
@@ -24,10 +23,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-
-        intent?.getParcelableArrayListExtra<Location>("location")?.let {
-            locations = it
-        }
+        locations = intent?.getParcelableArrayListExtra("location")
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -41,15 +37,12 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun pokeMarker(map: GoogleMap) {
-        Log.d("asfdasdfsdfsdf", "sdfsdfasdfasdfasdf")
         locations?.forEachIndexed { index, location ->
             location?.let {
-                Log.d("asfdasdfsdfsdf", "sdfsdfasdfasdfasdf")
                 val lat = it.lat?.toDouble() ?: return@let
-                val lan = it.lan?.toDouble() ?: return@let
+                val lan = it.lng?.toDouble() ?: return@let
 
                 val latlng = LatLng(lat, lan)
-                Log.d("asfdasdfsdfsdf", latlng.toString())
                 val marker = MarkerOptions().position(latlng).title(latlng.toString())
                 map.addMarker(marker)
 

@@ -74,7 +74,7 @@ class DetailDialog : DialogFragment() {
 
     private fun showMap(list: List<Location?>) {
         val intent = Intent(activity, MapsActivity::class.java)
-        intent.putParcelableArrayListExtra("location", list as ArrayList<Location?>)
+        intent.putParcelableArrayListExtra("location", ArrayList(list))
         context?.let {
             startActivity(intent)
         }

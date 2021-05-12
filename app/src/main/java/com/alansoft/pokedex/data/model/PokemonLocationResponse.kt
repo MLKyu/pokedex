@@ -14,5 +14,5 @@ data class PokemonLocationResponse(
 @Parcelize
 data class Location(
     val lat: String?,
-    val lan: String?
+    val lng: String?
 ) : Pokemons(), Parcelable

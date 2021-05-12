@@ -9,11 +9,12 @@ import kotlinx.android.parcel.Parcelize
  */
 data class PokemonNameResponse(
     var pokemons: List<Name?>?
-) : PokemonResponse()
+)
 
+@Parcelize
 data class Name(
     val names: List<String?>?
-) : Pokemons() {
+) : Pokemons(), Parcelable {
     fun getName(): String {
         var namess = ""
         if (names.isNullOrEmpty()) {
@@ -36,5 +37,3 @@ open class Pokemons : Parcelable {
     var id: Long = -1
     fun getIdString(): String = String.format("#%03d", id)
 }
-
-open class PokemonResponse
