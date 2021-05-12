@@ -15,8 +15,8 @@ data class PokemonDetailResponse(
     val height: Int,
     val sprites: Sprites?
 ) : Pokemons(), Parcelable {
-    fun getWeightString(): String = String.format("%.1f KG", weight.toFloat() / 10)
-    fun getHeightString(): String = String.format("%.1f M", height.toFloat() / 10)
+    fun getWeightString(): String = String.format("몸무게 : %.1f KG", weight.toFloat() / 10)
+    fun getHeightString(): String = String.format("키 : %.1f M", height.toFloat() / 10)
     fun getRepresentativeUri(): String? {
         if (sprites == null) {
             return ""

@@ -1,9 +1,14 @@
 package com.alansoft.pokedex.repository
 
 import androidx.annotation.WorkerThread
+import com.alansoft.pokedex.data.LocationCacheDataSource
 import com.alansoft.pokedex.data.RemoteDataSource
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.model.*
+import com.alansoft.pokedex.data.SearchCacheDataSource
+import com.alansoft.pokedex.data.model.Name
+import com.alansoft.pokedex.data.model.PokemonDetailResponse
+import com.alansoft.pokedex.data.model.PokemonLocationResponse
+import com.alansoft.pokedex.data.model.PokemonNameResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -13,27 +18,39 @@ import javax.inject.Inject
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
-class SearchRepository @Inject constructor(private val remote: RemoteDataSource) {
+class SearchRepository @Inject constructor(
+    private val locationCache: LocationCacheDataSource,
+    private val searchCache: SearchCacheDataSource,
+    private val remote: RemoteDataSource
+) {
     @WorkerThread
     fun getPokemonName(
         query: String,
         onSearch: (query: String, List<Name?>) -> List<Name?>
     ): Flow<Resource<PokemonNameResponse>> = flow {
         emit(Resource.loading())
-        val response: PokemonNameResponse = remote.getPokemonName()
+        val response: PokemonNameResponse
         emit(
-            if (response.pokemons.isNullOrEmpty()) {
-                Resource.empty()
+            if (searchCache.isExistAndFresh(query)) {
+                response = searchCache.getSearchResponse(query)
+                Resource.success(response)
             } else {
-                val lowerQuery = query.toLowerCase()
-                response.pokemons?.let {
-                    val list = onSearch(lowerQuery, it)
-                    if (list.isNullOrEmpty()) {
-                        Resource.empty()
-                    } else {
-                        Resource.success(PokemonNameResponse(list))
-                    }
-                } ?: Resource.empty()
+                response = remote.getPokemonName()
+                if (response.pokemons.isNullOrEmpty()) {
+                    Resource.empty()
+                } else {
+                    val lowerQuery = query.toLowerCase()
+                    response.pokemons?.let {
+                        val list = onSearch(lowerQuery, it)
+                        if (list.isNullOrEmpty()) {
+                            Resource.empty()
+                        } else {
+                            Resource.pushAndSuccess(PokemonNameResponse(list)) { response ->
+                                searchCache.pushSearchResponse(query, response)
+                            }
+                        }
+                    } ?: Resource.empty()
+                }
             }
         )
     }.retry(2) { cause ->
@@ -45,19 +62,27 @@ class SearchRepository @Inject constructor(private val remote: RemoteDataSource)
     @WorkerThread
     fun getPokemonLocation(
         id: Long,
-        findLoacation: (id: Long, data: List<Location?>) -> List<Location?>
-    ): Flow<Resource<List<Location?>>> = flow {
+        findLocation: (id: Long, data: PokemonLocationResponse) -> PokemonLocationResponse
+    ): Flow<Resource<PokemonLocationResponse>> = flow {
         emit(Resource.loading())
-        val response: PokemonLocationResponse = remote.getPokemonLocations()
+        val response: PokemonLocationResponse
         emit(
-            if (response.pokemons.isNullOrEmpty()) {
-                Resource.empty()
+            if (locationCache.isExistAndFresh(id)) {
+                response = locationCache.getResponse(id)
+                Resource.success(response)
             } else {
-                val location = findLoacation(id, response.pokemons)
-                if (location.isNullOrEmpty()) {
+                response = remote.getPokemonLocations()
+                if (response.pokemons.isNullOrEmpty()) {
                     Resource.empty()
                 } else {
-                    Resource.success(location)
+                    val location = findLocation(id, response)
+                    if (location.pokemons.isNullOrEmpty()) {
+                        Resource.empty()
+                    } else {
+                        Resource.pushAndSuccess(location) {
+                            locationCache.pushResponse(id, location)
+                        }
+                    }
                 }
             }
         )

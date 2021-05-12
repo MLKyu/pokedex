@@ -1,6 +1,6 @@
 package com.alansoft.pokedex.data
 
-import com.alansoft.pokedex.data.model.PokemonNameResponse
+import com.alansoft.pokedex.data.model.PokemonLocationResponse
 import java.util.*
 import javax.inject.Inject
 
@@ -8,31 +8,30 @@ import javax.inject.Inject
  * Created by LEE MIN KYU on 2021/05/12
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
-class SearchCacheDataSource
-@Inject constructor() {
+class LocationCacheDataSource @Inject constructor() {
     private val cached: LinkedList<Data> = LinkedList()
 
-    fun pushSearchResponse(query: String, queryResponse: PokemonNameResponse) {
+    fun pushResponse(id: Long, queryResponse: PokemonLocationResponse) {
         if (cached.size >= 5) {
             cached.removeFirst()
         }
-        cached.addLast(Data(query, queryResponse))
+        cached.addLast(Data(id, queryResponse))
     }
 
-    fun getSearchResponse(query: String): PokemonNameResponse {
-        return cached.first { it.query == query }.queryResponse.copy()
+    fun getResponse(id: Long): PokemonLocationResponse {
+        return cached.first { it.id == id }.response.copy()
     }
 
-    fun isExistAndFresh(query: String): Boolean {
-        val index = isExist(query)
+    fun isExistAndFresh(id: Long): Boolean {
+        val index = isExist(id)
         if (index == -1) {
             return false
         }
         return isFresh(index)
     }
 
-    private fun isExist(query: String): Int {
-        return cached.indexOfFirst { it.query == query }
+    private fun isExist(id: Long): Int {
+        return cached.indexOfFirst { it.id == id }
     }
 
     private fun isFresh(index: Int): Boolean {
@@ -44,8 +43,8 @@ class SearchCacheDataSource
     }
 
     private inner class Data(
-        val query: String,
-        val queryResponse: PokemonNameResponse
+        val id: Long,
+        val response: PokemonLocationResponse
     ) {
         val createdAt: Long = System.currentTimeMillis()
 

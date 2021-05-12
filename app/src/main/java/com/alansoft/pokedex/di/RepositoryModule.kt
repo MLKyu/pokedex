@@ -1,6 +1,8 @@
 package com.alansoft.pokedex.di
 
+import com.alansoft.pokedex.data.LocationCacheDataSource
 import com.alansoft.pokedex.data.RemoteDataSource
+import com.alansoft.pokedex.data.SearchCacheDataSource
 import com.alansoft.pokedex.data.api.PokeApi
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.Module
@@ -18,9 +20,21 @@ import dagger.hilt.android.scopes.ViewModelScoped
 object RepositoryModule {
     @ViewModelScoped
     @Provides
-    fun provideSearchDataSource(demoApi: PokeApi) = RemoteDataSource(demoApi)
+    fun provideLocationCacheDataSource() = LocationCacheDataSource()
 
     @ViewModelScoped
     @Provides
-    fun provideSearchRepository(remote: RemoteDataSource) = SearchRepository(remote)
+    fun provideSearchCacheDataSource() = SearchCacheDataSource()
+
+    @ViewModelScoped
+    @Provides
+    fun provideSearchDataSource(pokeApi: PokeApi) = RemoteDataSource(pokeApi)
+
+    @ViewModelScoped
+    @Provides
+    fun provideSearchRepository(
+        locationCache: LocationCacheDataSource,
+        searchCache: SearchCacheDataSource,
+        remote: RemoteDataSource
+    ) = SearchRepository(locationCache, searchCache, remote)
 }

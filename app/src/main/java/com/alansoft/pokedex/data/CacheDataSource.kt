@@ -1,6 +1,5 @@
 package com.alansoft.pokedex.data
 
-import com.alansoft.pokedex.data.model.PokemonNameResponse
 import java.util.*
 import javax.inject.Inject
 
@@ -8,31 +7,31 @@ import javax.inject.Inject
  * Created by LEE MIN KYU on 2021/05/12
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
-class SearchCacheDataSource
+class CacheDataSource<T>
 @Inject constructor() {
     private val cached: LinkedList<Data> = LinkedList()
 
-    fun pushSearchResponse(query: String, queryResponse: PokemonNameResponse) {
+    fun pushResponse(id: Long, queryResponse: T) {
         if (cached.size >= 5) {
             cached.removeFirst()
         }
-        cached.addLast(Data(query, queryResponse))
+        cached.addLast(Data(id, queryResponse))
     }
 
-    fun getSearchResponse(query: String): PokemonNameResponse {
-        return cached.first { it.query == query }.queryResponse.copy()
+    fun getResponse(id: Long): T {
+        return cached.first { it.id == id }.response
     }
 
-    fun isExistAndFresh(query: String): Boolean {
-        val index = isExist(query)
+    fun isExistAndFresh(id: Long): Boolean {
+        val index = isExist(id)
         if (index == -1) {
             return false
         }
         return isFresh(index)
     }
 
-    private fun isExist(query: String): Int {
-        return cached.indexOfFirst { it.query == query }
+    private fun isExist(id: Long): Int {
+        return cached.indexOfFirst { it.id == id }
     }
 
     private fun isFresh(index: Int): Boolean {
@@ -44,8 +43,8 @@ class SearchCacheDataSource
     }
 
     private inner class Data(
-        val query: String,
-        val queryResponse: PokemonNameResponse
+        val id: Long,
+        val response: T
     ) {
         val createdAt: Long = System.currentTimeMillis()
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.model.Location
+import com.alansoft.pokedex.data.model.PokemonLocationResponse
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +22,7 @@ class DetailViewModel @Inject constructor(
 ) : ViewModel() {
     private val id = MutableStateFlow(-1L)
 
-    val results: LiveData<Resource<List<Location?>>> = id
+    val results: LiveData<Resource<PokemonLocationResponse>> = id
         .filter {
             it >= 0
         }.flatMapLatest {
@@ -35,7 +35,9 @@ class DetailViewModel @Inject constructor(
         }
     }
 
-    private fun findLocation(id: Long, pokemons: List<Location?>): List<Location?> {
-        return pokemons.filter { id == it?.id }
+    private fun findLocation(id: Long, data: PokemonLocationResponse): PokemonLocationResponse {
+        val list = ArrayList(data.pokemons)
+        val responseList = list.filter { id == it?.id }
+        return PokemonLocationResponse(responseList)
     }
 }

@@ -19,5 +19,9 @@ sealed class Resource<out T> {
         fun error(exception: Throwable) = Error(exception)
         fun empty() = Empty
         fun loading() = Loading
+        fun <T> pushAndSuccess(data: T, block: (data: T) -> Unit): Resource<T> {
+            block(data)
+            return Success(data)
+        }
     }
 }

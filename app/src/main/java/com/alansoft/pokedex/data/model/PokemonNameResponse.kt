@@ -1,8 +1,5 @@
 package com.alansoft.pokedex.data.model
 
-import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
-
 /**
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
@@ -11,10 +8,9 @@ data class PokemonNameResponse(
     var pokemons: List<Name?>?
 )
 
-@Parcelize
 data class Name(
     val names: List<String?>?
-) : Pokemons(), Parcelable {
+) : Pokemons() {
     fun getName(): String {
         var namess = ""
         if (names.isNullOrEmpty()) {
@@ -32,8 +28,7 @@ data class Name(
     }
 }
 
-@Parcelize
-open class Pokemons : Parcelable {
+open class Pokemons {
     var id: Long = -1
     fun getIdString(): String = String.format("#%03d", id)
 }

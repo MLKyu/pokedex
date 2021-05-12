@@ -11,7 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.model.Location
+import com.alansoft.pokedex.data.model.PokemonLocationResponse
 import com.alansoft.pokedex.databinding.FragmentDetailBinding
 import com.alansoft.pokedex.map.MapsActivity
 import com.alansoft.pokedex.util.toast
@@ -72,9 +72,9 @@ class DetailDialog : DialogFragment() {
         }
     }
 
-    private fun showMap(list: List<Location?>) {
+    private fun showMap(data: PokemonLocationResponse) {
         val intent = Intent(activity, MapsActivity::class.java)
-        intent.putParcelableArrayListExtra("location", ArrayList(list))
+        intent.putParcelableArrayListExtra("location", ArrayList(data.pokemons))
         context?.let {
             startActivity(intent)
         }
