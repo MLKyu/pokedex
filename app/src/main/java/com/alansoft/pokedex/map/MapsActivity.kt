@@ -9,7 +9,9 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
+
 
 /**
  * Created by LEE MIN KYU on 2021/05/09
@@ -17,19 +19,17 @@ import com.google.android.gms.maps.model.MarkerOptions
  */
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-
     private var locations: List<Location?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
+        hideActionbar()
         locations = intent?.getParcelableArrayListExtra("location")
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
-
-
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -37,20 +37,28 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun pokeMarker(map: GoogleMap) {
-        locations?.forEachIndexed { index, location ->
+        val australiaBounds = LatLngBounds.builder()
+
+        map.setMinZoomPreference(6.0f)
+        map.setMaxZoomPreference(14.0f)
+
+        locations?.forEach { location ->
             location?.let {
                 val lat = it.lat?.toDouble() ?: return@let
                 val lan = it.lng?.toDouble() ?: return@let
 
                 val latlng = LatLng(lat, lan)
+                australiaBounds.include(latlng)
                 val marker = MarkerOptions().position(latlng).title(latlng.toString())
                 map.addMarker(marker)
-
-                if (index == 0) {
-                    map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
-                }
             }
         }
 
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(australiaBounds.build().center, 10f))
+
+    }
+
+    private fun hideActionbar() {
+        supportActionBar?.hide()
     }
 }
