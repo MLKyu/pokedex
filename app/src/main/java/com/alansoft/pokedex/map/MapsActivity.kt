@@ -18,16 +18,17 @@ import com.google.android.gms.maps.model.MarkerOptions
  */
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
 
     private var locations: List<Location?>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        savedInstanceState?.getParcelableArrayList<Location?>("location")?.let {
+
+        intent?.getParcelableArrayListExtra<Location>("location")?.let {
             locations = it
         }
+
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -35,32 +36,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     }
 
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
-        this.pokeMarker()
+        this.pokeMarker(googleMap)
     }
 
-    fun pokeMarker() {
+    private fun pokeMarker(map: GoogleMap) {
+        Log.d("asfdasdfsdfsdf", "sdfsdfasdfasdfasdf")
         locations?.forEachIndexed { index, location ->
             location?.let {
+                Log.d("asfdasdfsdfsdf", "sdfsdfasdfasdfasdf")
                 val lat = it.lat?.toDouble() ?: return@let
                 val lan = it.lan?.toDouble() ?: return@let
+
                 val latlng = LatLng(lat, lan)
-                Log.d("latlnglatlnglatlng", latlng.toString())
-                val marker = MarkerOptions().position(latlng).title("")
-                mMap.addMarker(marker)
+                Log.d("asfdasdfsdfsdf", latlng.toString())
+                val marker = MarkerOptions().position(latlng).title(latlng.toString())
+                map.addMarker(marker)
 
                 if (index == 0) {
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+                    map.moveCamera(CameraUpdateFactory.newLatLng(latlng))
                 }
             }
         }

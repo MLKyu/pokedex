@@ -54,7 +54,11 @@ class SearchRepository @Inject constructor(private val remote: RemoteDataSource)
                 Resource.empty()
             } else {
                 val location = findLoacation(id, response.pokemons)
-                Resource.success(location)
+                if (location.isNullOrEmpty()) {
+                    Resource.empty()
+                } else {
+                    Resource.success(location)
+                }
             }
         )
     }.retry(2) { cause ->

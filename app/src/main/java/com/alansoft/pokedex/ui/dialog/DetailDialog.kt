@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat.startActivities
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
@@ -75,9 +74,9 @@ class DetailDialog : DialogFragment() {
 
     private fun showMap(list: List<Location?>) {
         val intent = Intent(activity, MapsActivity::class.java)
-        intent.putParcelableArrayListExtra("location", ArrayList(list))
+        intent.putParcelableArrayListExtra("location", list as ArrayList<Location?>)
         context?.let {
-            startActivities(it, arrayOf(intent))
+            startActivity(intent)
         }
         dismiss()
     }
