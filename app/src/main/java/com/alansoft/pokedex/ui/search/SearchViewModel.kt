@@ -24,7 +24,7 @@ class SearchViewModel @Inject constructor(
     private val repository: SearchRepository
 ) : ViewModel() {
     private val query = MutableStateFlow("")
-    private val id = MutableStateFlow(Pair<Long, String>(-1L, ""))
+    private val id = MutableStateFlow(Pair(-1L, ""))
 
     val results: LiveData<Resource<PokemonNameResponse>> = query
         .filter {

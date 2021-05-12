@@ -26,7 +26,9 @@ class DetailViewModel @Inject constructor(
         .filter {
             it >= 0
         }.flatMapLatest {
-            repository.getPokemonLocation(it) { id, data -> findLocation(id, data) }
+            repository.getPokemonLocation(
+                it
+            ) { id, data -> findLocation(id, data) }
         }.asLiveData()
 
     fun requestLocation(id: Long) {
