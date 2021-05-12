@@ -3,10 +3,7 @@ package com.alansoft.pokedex.repository
 import androidx.annotation.WorkerThread
 import com.alansoft.pokedex.data.RemoteDataSource
 import com.alansoft.pokedex.data.Resource
-import com.alansoft.pokedex.data.model.Location
-import com.alansoft.pokedex.data.model.PokemonDetailResponse
-import com.alansoft.pokedex.data.model.PokemonLocationResponse
-import com.alansoft.pokedex.data.model.PokemonNameResponse
+import com.alansoft.pokedex.data.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import java.io.IOException
@@ -18,7 +15,10 @@ import javax.inject.Inject
  */
 class SearchRepository @Inject constructor(private val remote: RemoteDataSource) {
     @WorkerThread
-    fun getPokemonName(query: String): Flow<Resource<PokemonNameResponse>> = flow {
+    fun getPokemonName(
+        query: String,
+        onSearch: (query: String, List<Name?>) -> List<Name?>
+    ): Flow<Resource<PokemonNameResponse>> = flow {
         emit(Resource.loading())
         val response: PokemonNameResponse = remote.getPokemonName()
         emit(
@@ -26,18 +26,14 @@ class SearchRepository @Inject constructor(private val remote: RemoteDataSource)
                 Resource.empty()
             } else {
                 val lowerQuery = query.toLowerCase()
-
-                val list = response.pokemons?.filter { filter ->
-                    !filter?.names.isNullOrEmpty() && filter?.names?.find {
-                        it?.contains(lowerQuery) ?: false
-                    } != null
-                }
-
-                if (list.isNullOrEmpty()) {
-                    Resource.empty()
-                } else {
-                    Resource.success(PokemonNameResponse(list))
-                }
+                response.pokemons?.let {
+                    val list = onSearch(lowerQuery, it)
+                    if (list.isNullOrEmpty()) {
+                        Resource.empty()
+                    } else {
+                        Resource.success(PokemonNameResponse(list))
+                    }
+                } ?: Resource.empty()
             }
         )
     }.retry(2) { cause ->
@@ -47,19 +43,18 @@ class SearchRepository @Inject constructor(private val remote: RemoteDataSource)
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    fun getPokemonLocation(id: Long): Flow<Resource<Location>> = flow {
+    fun getPokemonLocation(
+        id: Long,
+        findLoacation: (id: Long, data: List<Location?>) -> List<Location?>
+    ): Flow<Resource<List<Location?>>> = flow {
         emit(Resource.loading())
         val response: PokemonLocationResponse = remote.getPokemonLocations()
         emit(
             if (response.pokemons.isNullOrEmpty()) {
                 Resource.empty()
             } else {
-                val location: Location? = response.pokemons.find { id == it?.id }
-                if (location == null) {
-                    Resource.empty()
-                } else {
-                    Resource.success(location)
-                }
+                val location = findLoacation(id, response.pokemons)
+                Resource.success(location)
             }
         )
     }.retry(2) { cause ->

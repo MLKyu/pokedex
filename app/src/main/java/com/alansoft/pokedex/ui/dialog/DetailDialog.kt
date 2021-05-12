@@ -12,13 +12,17 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.Resource
+import com.alansoft.pokedex.data.model.Location
 import com.alansoft.pokedex.databinding.FragmentDetailBinding
 import com.alansoft.pokedex.map.MapsActivity
+import com.alansoft.pokedex.util.toast
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
+@AndroidEntryPoint
 class DetailDialog : DialogFragment() {
     private val args: DetailDialogArgs by navArgs()
     lateinit var binding: FragmentDetailBinding
@@ -43,10 +47,11 @@ class DetailDialog : DialogFragment() {
         viewModel.run {
             results.observe(viewLifecycleOwner, {
                 when (it) {
-                    is Resource.Loading -> {
-                    }
                     is Resource.Success -> {
-                        showMap()
+                        showMap(it.data)
+                    }
+                    is Resource.Empty -> {
+                        toast("서식지 정보가 없습니다.")
                     }
                     else -> {
                         // nothing
@@ -68,8 +73,9 @@ class DetailDialog : DialogFragment() {
         }
     }
 
-    private fun showMap() {
+    private fun showMap(list: List<Location?>) {
         val intent = Intent(activity, MapsActivity::class.java)
+        intent.putParcelableArrayListExtra("location", ArrayList(list))
         context?.let {
             startActivities(it, arrayOf(intent))
         }

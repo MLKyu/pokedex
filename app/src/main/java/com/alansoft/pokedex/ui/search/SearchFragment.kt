@@ -13,6 +13,7 @@ import com.alansoft.pokedex.data.model.Name
 import com.alansoft.pokedex.data.model.PokemonDetailResponse
 import com.alansoft.pokedex.databinding.FragmentSearchBinding
 import com.alansoft.pokedex.ui.base.BaseFragment
+import com.alansoft.pokedex.util.toast
 import dagger.hilt.android.AndroidEntryPoint
 
 /**
@@ -48,6 +49,9 @@ class SearchFragment : BaseFragment<FragmentSearchBinding>() {
                     }
                     is Resource.Success -> {
                         adapter.submitList(it.data.pokemons)
+                    }
+                    is Resource.Empty -> {
+                        toast("검색 결과가 없습니다.")
                     }
                     else -> {
                         // nothing

@@ -1,8 +1,10 @@
 package com.alansoft.pokedex.map
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.alansoft.pokedex.R
+import com.alansoft.pokedex.data.model.Location
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -18,13 +20,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
 
+    private var locations: List<Location?>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        savedInstanceState?.getParcelableArrayList<Location?>("location")?.let {
+            locations = it
+        }
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+
     }
 
     /**
@@ -38,10 +46,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        this.pokeMarker()
+    }
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+    fun pokeMarker() {
+        locations?.forEachIndexed { index, location ->
+            location?.let {
+                val lat = it.lat?.toDouble() ?: return@let
+                val lan = it.lan?.toDouble() ?: return@let
+                val latlng = LatLng(lat, lan)
+                Log.d("latlnglatlnglatlng", latlng.toString())
+                val marker = MarkerOptions().position(latlng).title("")
+                mMap.addMarker(marker)
+
+                if (index == 0) {
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng))
+                }
+            }
+        }
+
     }
 }

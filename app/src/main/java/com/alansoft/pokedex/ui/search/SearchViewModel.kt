@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.alansoft.pokedex.data.Resource
+import com.alansoft.pokedex.data.model.Name
 import com.alansoft.pokedex.data.model.PokemonDetailResponse
 import com.alansoft.pokedex.data.model.PokemonNameResponse
 import com.alansoft.pokedex.repository.SearchRepository
@@ -29,13 +30,21 @@ class SearchViewModel @Inject constructor(
         .filter {
             it.isNotEmpty()
         }.flatMapLatest {
-            repository.getPokemonName(it)
+            repository.getPokemonName(it) { query, data -> search(query, data) }
         }.asLiveData()
 
     fun setQuery(originalInput: String) {
         val input = originalInput.toLowerCase(Locale.getDefault()).trim()
         if (query.value != input) {
             query.value = input
+        }
+    }
+
+    fun search(query: String, pokemons: List<Name?>): List<Name?> {
+        return pokemons.filter { filter ->
+            !filter?.names.isNullOrEmpty() && filter?.names?.find {
+                it?.contains(query, true) ?: false
+            } != null
         }
     }
 
