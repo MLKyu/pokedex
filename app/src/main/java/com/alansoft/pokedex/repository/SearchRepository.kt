@@ -28,7 +28,6 @@ class SearchRepository @Inject constructor(
         query: String,
         onSearch: (query: String, List<Name?>) -> List<Name?>
     ): Flow<Resource<PokemonNameResponse>> = flow {
-        emit(Resource.loading())
         val response: PokemonNameResponse
         emit(
             if (searchCache.isExistAndFresh(query)) {
@@ -53,6 +52,8 @@ class SearchRepository @Inject constructor(
                 }
             }
         )
+    }.onStart {
+        emit(Resource.loading())
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->
@@ -64,7 +65,6 @@ class SearchRepository @Inject constructor(
         id: Long,
         findLocation: (id: Long, data: PokemonLocationResponse) -> PokemonLocationResponse
     ): Flow<Resource<PokemonLocationResponse>> = flow {
-        emit(Resource.loading())
         val response: PokemonLocationResponse
         emit(
             if (locationCache.isExistAndFresh(id)) {
@@ -86,6 +86,8 @@ class SearchRepository @Inject constructor(
                 }
             }
         )
+    }.onStart {
+        emit(Resource.loading())
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->
@@ -93,14 +95,16 @@ class SearchRepository @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    fun getPokemonInfo(id: Pair<Long, String>): Flow<Resource<PokemonDetailResponse>> = flow {
-        emit(Resource.loading())
-        val response: PokemonDetailResponse = remote.getPokemonInfo(id.first)
-        response.name = id.second
-        emit(Resource.success(response))
-    }.retry(2) { cause ->
-        cause is IOException
-    }.catch { e ->
-        emit(Resource.error(e))
-    }.flowOn(Dispatchers.IO)
+    fun getPokemonInfo(id: Pair<Long, String>): Flow<Resource<PokemonDetailResponse>> =
+        flow<Resource<PokemonDetailResponse>> {
+            val response: PokemonDetailResponse = remote.getPokemonInfo(id.first)
+            response.name = id.second
+            emit(Resource.success(response))
+        }.onStart {
+            emit(Resource.loading())
+        }.retry(2) { cause ->
+            cause is IOException
+        }.catch { e ->
+            emit(Resource.error(e))
+        }.flowOn(Dispatchers.IO)
 }
