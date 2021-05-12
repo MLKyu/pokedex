@@ -17,17 +17,21 @@ data class PokemonDetailResponse(
 ) : Pokemons(), Parcelable {
     fun getWeightString(): String = String.format("몸무게 : %.1f KG", weight.toFloat() / 10)
     fun getHeightString(): String = String.format("키 : %.1f M", height.toFloat() / 10)
-    fun getRepresentativeUri(): String? {
-        if (sprites == null) {
-            return ""
-        }
-        return sprites.run {
-            if (frontDefault != null) {
-                frontDefault
-            } else {
-                null
-            }
-        }
+    fun getRepresentativeUri(): String {
+        return sprites?.run {
+            frontDefault
+                ?: (backDefault
+                    ?: (backFemale
+                        ?: (backShiny
+                            ?: (backShinyFemale
+                                ?: (frontFemale
+                                    ?: (frontShiny
+                                        ?: (frontShinyFemale
+                                            ?: (other?.dreamWorld?.frontDefault
+                                                ?: (other?.dreamWorld?.frontFemale
+                                                    ?: (other?.officialArtwork?.frontDefault
+                                                            )))))))))) ?: ""
+        } ?: ""
     }
 }
 
