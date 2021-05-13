@@ -1,6 +1,5 @@
 package com.alansoft.pokedex.repository
 
-import android.util.Log
 import androidx.annotation.WorkerThread
 import com.alansoft.pokedex.data.LocationCacheDataSource
 import com.alansoft.pokedex.data.RemoteDataSource
@@ -90,8 +89,6 @@ class SearchRepository @Inject constructor(
                 }
             }
         )
-    }.onStart {
-    }.onCompletion {
     }.retry(2) { cause ->
         cause is IOException
     }.catch { e ->
