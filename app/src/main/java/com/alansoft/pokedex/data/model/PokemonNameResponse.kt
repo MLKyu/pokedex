@@ -12,19 +12,18 @@ data class Name(
     val names: List<String?>?
 ) : Pokemons() {
     fun getName(): String {
-        var namess = ""
+        var displayName = ""
         if (names.isNullOrEmpty()) {
-            return namess
+            return displayName
         }
 
-        for (nameaa in names.withIndex()) {
-            namess += "${nameaa.value}"
-            if (nameaa.index != names.size - 1) {
-                namess += "/"
+        for (name in names.withIndex()) {
+            displayName += "${name.value}"
+            if (name.index != names.size - 1) {
+                displayName += "/"
             }
         }
-
-        return namess
+        return displayName
     }
 }
 
