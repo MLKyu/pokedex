@@ -10,6 +10,7 @@ import com.alansoft.pokedex.data.model.PokemonNameResponse
 import com.alansoft.pokedex.repository.SearchRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import java.util.*
@@ -24,7 +25,10 @@ class SearchViewModel @Inject constructor(
     private val repository: SearchRepository
 ) : ViewModel() {
     private val query = MutableStateFlow("")
-    private val id = MutableStateFlow(Pair(-1L, ""))
+    private val _id = MutableStateFlow(Triple(-1L, "", 0))
+    private val id: StateFlow<Triple<Long, String, Int>> = _id
+
+    private var isLoading: Boolean = false
 
     val results: LiveData<Resource<PokemonNameResponse>> = query
         .filter {
@@ -38,9 +42,7 @@ class SearchViewModel @Inject constructor(
 
     fun setQuery(originalInput: String) {
         val input = originalInput.toLowerCase(Locale.getDefault()).trim()
-        if (query.value != input) {
-            query.value = input
-        }
+        query.value = input
     }
 
     fun search(query: String, pokemons: List<Name?>): List<Name?> {
@@ -53,7 +55,12 @@ class SearchViewModel @Inject constructor(
 
     fun requestDetail(id: Long, name: String) {
         if (this.id.value.first != id) {
-            this.id.value = id to name
+            this._id.value = Triple(id, name, 0)
+        } else {
+            if (!isLoading) {
+                var count = this.id.value.third
+                this._id.value = Triple(id, name, ++count)
+            }
         }
     }
 
@@ -61,7 +68,7 @@ class SearchViewModel @Inject constructor(
         .filter {
             it.first >= 0
         }.flatMapLatest {
-            repository.getPokemonInfo(it)
+            repository.getPokemonInfo(it) { loading -> isLoading = loading }
         }.asLiveData()
 
 }

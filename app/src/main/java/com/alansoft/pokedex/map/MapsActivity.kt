@@ -1,6 +1,7 @@
 package com.alansoft.pokedex.map
 
 import android.os.Bundle
+import androidx.annotation.VisibleForTesting
 import androidx.appcompat.app.AppCompatActivity
 import com.alansoft.pokedex.R
 import com.alansoft.pokedex.data.model.Location
@@ -11,21 +12,26 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
-
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Created by LEE MIN KYU on 2021/05/09
  * Copyright © 2021 Dreamus Company. All rights reserved.
  */
+@AndroidEntryPoint
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var locations: List<Location?>? = null
+    private var name: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_maps)
         hideActionbar()
-        locations = intent?.getParcelableArrayListExtra("location")
+        intent?.run {
+            locations = getParcelableArrayListExtra("location")
+            name = getStringExtra("name")
+        }
 
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
@@ -33,7 +39,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        this.pokeMarker(googleMap)
+        pokeMarker(googleMap)
     }
 
     private fun pokeMarker(map: GoogleMap) {
@@ -49,13 +55,11 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 val latlng = LatLng(lat, lan)
                 australiaBounds.include(latlng)
-                val marker = MarkerOptions().position(latlng).title(latlng.toString())
+                val marker = MarkerOptions().position(latlng).title(name)
                 map.addMarker(marker)
             }
         }
-
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(australiaBounds.build().center, 10f))
-
     }
 
     private fun hideActionbar() {

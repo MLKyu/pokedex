@@ -1,5 +1,6 @@
 package com.alansoft.pokedex.repository
 
+import android.util.Log
 import androidx.annotation.WorkerThread
 import com.alansoft.pokedex.data.LocationCacheDataSource
 import com.alansoft.pokedex.data.RemoteDataSource
@@ -98,13 +99,18 @@ class SearchRepository @Inject constructor(
     }.flowOn(Dispatchers.IO)
 
     @WorkerThread
-    fun getPokemonInfo(id: Pair<Long, String>): Flow<Resource<PokemonDetailResponse>> =
+    fun getPokemonInfo(
+        id: Triple<Long, String, Int>,
+        onLoading: (Boolean) -> Unit
+    ): Flow<Resource<PokemonDetailResponse>> =
         flow<Resource<PokemonDetailResponse>> {
             val response: PokemonDetailResponse = remote.getPokemonInfo(id.first)
             response.name = id.second
             emit(Resource.success(response))
         }.onStart {
+            onLoading(true)
         }.onCompletion {
+            onLoading(false)
         }.retry(2) { cause ->
             cause is IOException
         }.catch { e ->

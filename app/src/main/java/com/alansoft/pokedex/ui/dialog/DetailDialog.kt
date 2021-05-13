@@ -80,11 +80,10 @@ class DetailDialog : DialogFragment() {
     }
 
     private fun showMap(data: PokemonLocationResponse) {
+        dismiss()
         val intent = Intent(activity, MapsActivity::class.java)
         intent.putParcelableArrayListExtra("location", ArrayList(data.pokemons))
-        context?.let {
-            startActivity(intent)
-        }
-        dismiss()
+        intent.putExtra("name", args.item.name)
+        context?.startActivity(intent)
     }
 }
