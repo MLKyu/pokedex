@@ -1,6 +1,7 @@
 package com.alansoft.pokedex.ui.search
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.alansoft.pokedex.data.Resource
@@ -28,7 +29,7 @@ class SearchViewModel @Inject constructor(
     private val _id = MutableStateFlow(Triple(-1L, "", 0))
     private val id: StateFlow<Triple<Long, String, Int>> = _id
 
-    private var isLoading: Boolean = false
+    private var isLoading = MutableLiveData<Boolean>()
 
     val results: LiveData<Resource<PokemonNameResponse>> = query
         .filter {
@@ -36,7 +37,7 @@ class SearchViewModel @Inject constructor(
         }.flatMapLatest {
             repository.getPokemonName(
                 it,
-                { },
+                { isLoading.postValue(true) },
                 { query, data -> search(query, data) })
         }.asLiveData()
 
@@ -57,7 +58,7 @@ class SearchViewModel @Inject constructor(
         if (this.id.value.first != id) {
             this._id.value = Triple(id, name, 0)
         } else {
-            if (!isLoading) {
+            if (isLoading.value == false) {
                 var count = this.id.value.third
                 this._id.value = Triple(id, name, ++count)
             }
@@ -68,7 +69,7 @@ class SearchViewModel @Inject constructor(
         .filter {
             it.first >= 0
         }.flatMapLatest {
-            repository.getPokemonInfo(it) { loading -> isLoading = loading }
+            repository.getPokemonInfo(it) { loading -> isLoading.value = loading }
         }.asLiveData()
 
 }
