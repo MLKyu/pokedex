@@ -71,5 +71,4 @@ class SearchViewModel @Inject constructor(
         }.flatMapLatest {
             repository.getPokemonInfo(it) { loading -> isLoading.value = loading }
         }.asLiveData()
-
 }
